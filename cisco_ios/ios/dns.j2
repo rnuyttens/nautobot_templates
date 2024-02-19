@@ -1,0 +1,7 @@
+no ip domain lookup
+{%- if config_context["domain-name"] is defined %}
+ip domain name {{ config_context["domain-name"] }}
+{%- endif %}
+{%- if config_context["name-server"] is defined %}
+ip name-server {{ config_context["name-server"] }}
+{%- endif %}

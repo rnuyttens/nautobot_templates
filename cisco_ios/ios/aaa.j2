@@ -1,0 +1,11 @@
+{%- if config_context["aaa"]["tacacs"] is defined%}
+aaa authentication login VTY_authen group administrator_tacacs_group local
+aaa authentication attempts login 1
+aaa authorization exec VTY_author group administrator_tacacs_group local if-authenticated
+aaa accounting exec default start-stop group administrator_tacacs_group
+{%- elif config_context["aaa"]["radius"] is defined%}
+aaa authentication login VTY_authen group administrator_radius_group local
+aaa authentication attempts login 1
+aaa authorization exec VTY_author group administrator_radius_group local if-authenticated
+aaa accounting exec default start-stop group administrator_radius_group
+{%- endif %}

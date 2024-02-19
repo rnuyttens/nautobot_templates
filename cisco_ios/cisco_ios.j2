@@ -1,0 +1,143 @@
+!
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+! Call-home is enabled by Smart-Licensing.
+service call-home
+platform qfp utilization monitor load 80
+platform punt-keepalive disable-kernel-core
+platform console serial
+!
+{% include './ios/hostname.j2' %}
+!
+ip routing
+!
+logging userinfo
+!
+{%- if config_context["aaa"] == false %}
+no aaa new-model
+{%- elif config_context["aaa"]  is defined %}
+aaa new-model
+{% include "./ios/aaa.j2" %}
+{%- endif %}
+{% include "./ios/call_home.j2" %}
+!
+!
+!
+!
+!
+!
+!
+{% include './ios/dns.j2' %}
+!
+!
+!
+login on-success log
+!
+!
+!
+{% if config_context['vtp_domain'] is defined %}
+vtp domain {{ config_context['vtp_domain'] }}
+{% endif %}
+vtp mode transparent
+!
+{%- include './ios/vlan.j2' %}
+!
+subscriber templating
+! 
+! 
+errdisable recovery cause udld
+errdisable recovery cause bpduguard
+errdisable recovery cause security-violation
+errdisable recovery cause dtp-flap
+errdisable recovery cause link-flap
+errdisable recovery cause sfp-config-mismatch
+errdisable recovery cause gbic-invalid
+errdisable recovery cause l2ptguard
+errdisable recovery cause psecure-violation
+errdisable recovery cause port-mode-failure
+errdisable recovery cause dhcp-rate-limit
+errdisable recovery cause pppoe-ia-rate-limit
+errdisable recovery cause mac-limit
+errdisable recovery cause vmps
+errdisable recovery cause storm-control
+errdisable recovery cause inline-power
+errdisable recovery cause arp-inspection
+errdisable recovery cause loopback 
+! 
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+spanning-tree extend system-id
+!
+{% include './ios/local_user.j2' %}
+!
+!
+{%- if config_context["lldp"] is defined %}
+lldp run
+{%- endif %}
+{%- if config_context["cdp"] is defined %}
+cdp run
+{%- endif %}
+!
+!
+!
+{%- include './ios/interfaces.j2' %}
+!
+{%- if config_context["bgp"] is defined %}
+{%- include './ios/bgp.j2' %}
+{%- endif %}
+!
+!
+!
+ip forward-protocol nd
+no ip http server
+ip http authentication local
+no ip http secure-server
+!
+{%- if config_context["routes"] is defined %}
+{%- if config_context["routes"]["static"] is defined %}
+{%- include './ios/static_routes.j2' %}
+{%- endif %}
+{%- endif %}
+ip scp server enable
+!
+{% include "./ios/aaa_servers.j2" %}
+!
+{% include './ios/syslog.j2' %}
+!
+!
+{%- if config_context["snmp"] is defined %}
+{%- include './ios/snmp.j2' %}
+{%- endif %}
+!
+!
+!
+control-plane
+!
+!
+banner login ^CCC
+**************************************************
+
+----- Acces reserve aux personnes autorisees -----
+
+**************************************************
+
+^C
+!
+!
+{% include './ios/console_vty.j2' %}
+!
+{%- include './ios/ntp.j2' %}
+!
+!
+!
+!
+!
+{% include './ios/services.j2' %}
+end

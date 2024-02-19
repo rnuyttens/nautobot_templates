@@ -1,0 +1,30 @@
+radius-server dead-criteria time 5 tries 3
+radius-server deadtime 3
+{%- if config_context["aaa"]["tacacs"] is defined %}     
+{%- for server in config_context["aaa"]["tacacs"]["servers"] %}
+tacacs server tacacs_{{ server['ip'] }}
+ address ipv4 {{ server['ip'] }}
+ key 7 {{ server['secret'] }}
+ timeout 5
+!
+{%- endfor %}
+aaa group server tacacs+ administrator_tacacs_group
+{%- for server in config_context["aaa"]["tacacs"]["servers"] %}
+ server name tacacs_{{ server['ip'] }}
+{%- endfor %}
+ ip tacacs source-interface {{ config_context["aaa"]["tacacs"]["source-interface"] }}
+{%- endif %}
+{%- if config_context["aaa"]["radius"] is defined %}     
+{%- for server in config_context["aaa"]["radius"]["servers"] %}
+radius server radius_{{ server['ip'] }}
+ address ipv4 {{ server['ip'] }}
+ key 7 {{ server['secret'] }}
+ timeout 5
+!
+{%- endfor %}
+aaa group server radius administrator_radius_group
+{%- for server in config_context["aaa"]["radius"]["servers"] %}
+ server name radius_{{ server['ip'] }}
+{%- endfor %}
+ ip radius source-interface {{ config_context["aaa"]["radius"]["source-interface"] }}
+{%- endif %}

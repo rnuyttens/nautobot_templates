@@ -1,0 +1,56 @@
+{% for interface in interfaces %}
+interface {{ interface["name"] }}
+{%- if interface["description"] | length > 1 %}
+ description *** {{ interface["description"] }} ***
+{%- endif %}
+{%- if interface["vrf"]["name"] is defined %}
+ vrf forwarding {{ interface["vrf"]["name"] }}
+{%- endif %}
+{%- if interface["ip_addresses"] | length > 0 %}
+{%- for addr in interface["ip_addresses"] %}
+{%- if addr["address"] is defined %}
+ ip address {{ addr["address"] | ipaddr('address') }} {{ addr["address"] | ipaddr('netmask') }}
+ no ip redirects
+{%- endif %}
+{%- endfor %}
+{%- elif interface["mode"] is defined %}
+{%- if interface["mode"] == "ACCESS" %}
+ switchport mode access
+ switchport access vlan {{ interface["untagged_vlan"]['vid'] }}
+ spanning-tree portfast
+{%- elif interface["mode"] == "TAGGED_ALL" %}
+ switchport mode trunk
+{%- if interface["untagged_vlan"] is defined %}
+ switchport trunk native vlan {{ interface["untagged_vlan"]['vid'] }}
+{%- endif %}
+{%- elif interface["mode"] == "TAGGED" %}
+ switchport mode trunk
+{%- if interface["untagged_vlan"] is defined %}
+ switchport trunk native vlan {{ interface["untagged_vlan"]['vid'] }}
+{%- endif %}
+{%- if interface["tagged_vlans"] is defined %}
+{%- if interface["tagged_vlans"] | length > 0 %}
+{%- set my_string = [] %}
+{%- for vl in interface["tagged_vlans"] %}
+{%- set my_string=my_string.append(vl.vid|string) %}
+{%- endfor%}
+ switchport trunk allowed vlan  {{ my_string|join(",") or "" }}
+{%- endif %}
+{%- endif %}
+{%- endif %}
+{%- else %}
+ no ip address
+{%- endif %}
+{%- if interface["enabled"] == false %}
+ shutdown
+{%- endif %}
+{%- if "dot1x" in interface[_custom_field_data] %}
+{%- if interface[_custom_field_data]['dot1x'] is defined %}
+{%- include "./ios/dot1x.j2" %}
+{%- endif %}
+{%- endif %}
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+{%- endfor %}

@@ -1,0 +1,7 @@
+{%- for static in config_context["routes"]["static"] %}
+{%- if static.vrf is defined %}
+ip route vrf {{ static.vrf }} {{ static.destination }} {{ static.gateway }}
+{%- else %}
+ip route {{ static.destination }} {{ static.gateway }}
+{%- endif %}
+{%- endfor %}

@@ -1,0 +1,10 @@
+{%- for community in config_context["snmp"]["community"] %}
+snmp-server community {{ community["name"] }} {{ community["role"] }}
+{%- endfor %}
+snmp-server location {{ location["name"] }}
+snmp-server contact {{ config_context["snmp"]["contact"] }}
+{%- if config_context["snmp"]["community"]["host"] is defined %}
+{%- for host in config_context["snmp"]["community"]["host"] %}
+snmp-server host {{ host }} version {{ community["version"] }} {{ community["name"] }} 
+{%- endfor %}
+{%- endif %}

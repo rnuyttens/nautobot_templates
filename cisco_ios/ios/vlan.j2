@@ -1,0 +1,4 @@
+{%- for vlan in rel_vlan %}
+vlan {{ vlan['vid'] }}
+ name {{ vlan['name'] }}
+{%- endfor %}

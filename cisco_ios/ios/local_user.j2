@@ -1,0 +1,3 @@
+{%- for user in config_context["user"] %}
+username {{ user["name"] }} privilege 15 secret 0 {{ user["password"] }}
+{%- endfor %}

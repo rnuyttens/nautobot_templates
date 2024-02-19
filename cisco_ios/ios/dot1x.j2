@@ -1,0 +1,29 @@
+{%- if interface['_custom_field_data']['dot1x'][0] == "mab" %}
+ no access-session closed
+ authentication periodic
+ authentication timer reauthenticate server
+ access-session port-control auto
+ mab
+ dot1x pae authenticator
+ dot1x timeout tx-period 10
+ dot1x max-reauth-req 3
+{%- elif interface['_custom_field_data']['dot1x'][0] == "dot1x" %}
+ no access-session closed
+ authentication periodic
+ authentication timer reauthenticate server
+ access-session port-control auto
+ dot1x pae authenticator
+ dot1x timeout tx-period 10
+ dot1x max-reauth-req 3
+ service-policy type control subscriber DOT1X_POLICY
+{%- elif interface['_custom_field_data']['dot1x'][0] == "dot1x_mab" %}
+ no access-session closed
+ authentication periodic
+ authentication timer reauthenticate server
+ access-session port-control auto
+ mab
+ dot1x pae authenticator
+ dot1x timeout tx-period 10
+ dot1x max-reauth-req 3
+ service-policy type control subscriber DOT1X_POLICY
+{%- endif %}

@@ -1,0 +1,4 @@
+logging origin-id hostname
+{%- for syslog in config_context["syslog"] %}
+logging host {{ syslog["ip"] }} transport {{ syslog.protocol or "udp" }} port {{ syslog.port or "514" }}
+{%- endfor %}
